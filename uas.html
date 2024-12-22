@@ -135,6 +135,7 @@
             <input type="number" id="study-time" class="form-control mb-2" placeholder="Waktu Belajar (menit)" value="25">
             <input type="number" id="break-time" class="form-control mb-2" placeholder="Waktu Istirahat (menit)" value="5">
             <button id="start-timer" class="btn">Mulai Timer</button>
+            <button id="stop-timer" class="btn btn-danger">Berhenti Timer</button>
             <h3 id="timer-display" class="text-center my-3">00:00</h3>
 
             <div id="motivation-message" class="motivation">Mulailah hari ini dengan semangat!</div>
@@ -162,12 +163,16 @@
         const studyInput = document.getElementById('study-time');
         const breakInput = document.getElementById('break-time');
         const startTimerButton = document.getElementById('start-timer');
+        const stopTimerButton = document.getElementById('stop-timer');
         const timerDisplay = document.getElementById('timer-display');
         let timerInterval;
 
         startTimerButton.addEventListener('click', () => {
-            let time = parseInt(studyInput.value) * 60 || 25 * 60;
+            let studyTime = parseInt(studyInput.value) * 60 || 25 * 60;
+            let breakTime = parseInt(breakInput.value) * 60 || 5 * 60;
+            let time = studyTime;
             let isStudy = true;
+            let cycles = 4; // Total cycles (study + break)
 
             clearInterval(timerInterval);
             displayMotivationalMessage(); // Display message when timer starts
@@ -179,12 +184,32 @@
                 time--;
 
                 if (time < 0) {
+                    if (isStudy) {
+                        alert('Istirahat dulu!');
+                        time = breakTime;
+                    } else {
+                        alert('Waktunya belajar lagi!');
+                        time = studyTime;
+                        cycles--;
+                    }
+
                     isStudy = !isStudy;
-                    time = isStudy ? parseInt(studyInput.value) * 60 : parseInt(breakInput.value) * 60;
-                    alert(isStudy ? 'Waktunya belajar lagi!' : 'Istirahat dulu!');
                     displayMotivationalMessage(); // Display message on timer switch
+
+                    // Stop timer after all cycles
+                    if (cycles === 0) {
+                        clearInterval(timerInterval);
+                        timerDisplay.textContent = "00:00";
+                        alert('Pomodoro selesai! Selamat!');
+                    }
                 }
             }, 1000);
+        });
+
+        stopTimerButton.addEventListener('click', () => {
+            clearInterval(timerInterval);
+            timerDisplay.textContent = "00:00";
+            alert("Timer dihentikan!");
         });
 
         // To-Do List
