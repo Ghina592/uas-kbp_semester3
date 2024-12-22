@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Pendukung Belajar</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(to bottom right, #f0f0f0, #d6d6d6);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333333;
+        }
+
+        .header {
+            background: #93a2be;
+            color: #ffffff;
+            padding: 5px;
+            text-align: center;
+            margin-bottom: 100px;
+            box-shadow: 0 4px 8px rgba(160, 8, 16, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin: 0;
+        }
+
+        .main-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .task-container,
+        .pomodoro-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .task-container {
+            flex-grow: 2;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #333333;
+        }
+
+        .btn {
+            width: 100%;
+            margin-bottom: 10px;
+            background: #333333;
+            border: none;
+            color: #ffffff;
+        }
+
+        .btn:hover {
+            color: #93a2be;
+            background: #555555;
+        }
+
+        .todo-item {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            background: #f7f7f7;
+            border: none;
+        }
+
+        .todo-item.completed {
+            text-decoration: line-through;
+            color: #93a2be;
+        }
+
+        iframe {
+            width: 100%;
+            height: 80px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #timer-display {
+            font-size: 2rem;
+            color: #93a2be;
+        }
+
+        .motivation {
+            margin-top: 20px;
+            padding: 10px;
+            background: #e8f4ff;
+            border-radius: 8px;
+            text-align: center;
+            color: #555555;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Waktu Itu Duit!</h1>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Task Section -->
+        <div class="task-container">
+            <h2>To-Do List</h2>
+            <input type="text" id="todo-input" class="form-control mb-2" placeholder="Tambahkan target belajar...">
+            <button id="add-todo" class="btn">Tambah</button>
+            <ul id="todo-list" class="list-group mt-3"></ul>
+
+            <!-- Spotify Embed -->
+            <h2 class="mt-4">Spotify Playlist</h2>
+            <iframe src="https://open.spotify.com/embed/playlist/17BrSQnreKSHhoDYAIFyZ1?utm_source=generator" 
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture">
+            </iframe>
+        </div>
+
+        <!-- Pomodoro Timer Section -->
+        <div class="pomodoro-container">
+            <h2>Pomodoro Timer</h2>
+            <input type="number" id="study-time" class="form-control mb-2" placeholder="Waktu Belajar (menit)" value="25">
+            <input type="number" id="break-time" class="form-control mb-2" placeholder="Waktu Istirahat (menit)" value="5">
+            <button id="start-timer" class="btn">Mulai Timer</button>
+            <h3 id="timer-display" class="text-center my-3">00:00</h3>
+
+            <div id="motivation-message" class="motivation">Mulailah hari ini dengan semangat!</div>
+        </div>
+    </div>
+
+    <script>
+        // Array of motivational messages
+        const motivationalMessages = [
+            "Setiap langkah kecil mendekatkanmu pada tujuan besar!",
+            "Tetap fokus, sukses sudah menantimu!",
+            "Usaha tidak akan mengkhianati hasil!",
+            "Belajar hari ini adalah investasi untuk masa depanmu.",
+            "Kamu lebih kuat daripada yang kamu kira.",
+            "Setiap detik yang kamu gunakan untuk belajar sangat berharga."
+        ];
+
+        // Function to display a random motivational message
+        function displayMotivationalMessage() {
+            const message = motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)];
+            document.getElementById('motivation-message').textContent = message;
+        }
+
+        // Pomodoro Timer
+        const studyInput = document.getElementById('study-time');
+        const breakInput = document.getElementById('break-time');
+        const startTimerButton = document.getElementById('start-timer');
+        const timerDisplay = document.getElementById('timer-display');
+        let timerInterval;
+
+        startTimerButton.addEventListener('click', () => {
+            let time = parseInt(studyInput.value) * 60 || 25 * 60;
+            let isStudy = true;
+
+            clearInterval(timerInterval);
+            displayMotivationalMessage(); // Display message when timer starts
+
+            timerInterval = setInterval(() => {
+                const minutes = Math.floor(time / 60);
+                const seconds = time % 60;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                time--;
+
+                if (time < 0) {
+                    isStudy = !isStudy;
+                    time = isStudy ? parseInt(studyInput.value) * 60 : parseInt(breakInput.value) * 60;
+                    alert(isStudy ? 'Waktunya belajar lagi!' : 'Istirahat dulu!');
+                    displayMotivationalMessage(); // Display message on timer switch
+                }
+            }, 1000);
+        });
+
+        // To-Do List
+        const todoInput = document.getElementById('todo-input');
+        const addTodoButton = document.getElementById('add-todo');
+        const todoList = document.getElementById('todo-list');
+
+        addTodoButton.addEventListener('click', () => {
+            const text = todoInput.value.trim();
+            if (!text) return;
+
+            const li = document.createElement('li');
+            li.textContent = text;
+            li.className = 'list-group-item todo-item';
+            li.addEventListener('click', () => {
+                li.classList.toggle('completed');
+            });
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Hapus';
+            deleteButton.className = 'btn btn-danger btn-sm float-end';
+            deleteButton.addEventListener('click', () => {
+                li.remove();
+            });
+
+            li.appendChild(deleteButton);
+            todoList.appendChild(li);
+            todoInput.value = '';
+
+            displayMotivationalMessage(); // Display message when adding a new task
+        });
+    </script>
+</body>
+</html>
